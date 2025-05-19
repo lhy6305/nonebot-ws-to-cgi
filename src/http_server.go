@@ -139,6 +139,7 @@ func http_handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Write([]byte(response))
 	case <-timeout_ch:
+		custom_log("Error", "http server: backend ws server timeout in %s", http_api_timeout.String())
 		http_write_error(w, 504, "backend ws server timeout")
 	}
 

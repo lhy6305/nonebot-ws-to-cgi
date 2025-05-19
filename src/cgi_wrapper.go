@@ -27,7 +27,7 @@ func call_cgi_wrapper(message []byte) {
 	if len(resp.body.Bytes()) > 0 {
 		custom_log("Warn", "CGI output is not empty:\n%v", resp.String())
 	} else {
-		custom_log("Trace", "CGI output:\n%v", resp.String())
+		//custom_log("Trace", "CGI output:\n%v", resp.String())
 	}
 }
 
