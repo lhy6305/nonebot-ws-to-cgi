@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,7 +45,6 @@ var (
 )
 
 func config_parse_flags() {
-
 	flag.BoolVar(&clog_enable_debug, "clog-enable-debug", true, "")
 	flag.BoolVar(&clog_enable_trace, "clog-enable-trace", true, "")
 	flag.BoolVar(&clog_log_trace_to_file_only, "clog-log-trace-to-file-only", false, "")
@@ -67,6 +68,21 @@ func config_parse_flags() {
 	flag.DurationVar(&http_write_timeout, "http-write-timeout", 0*time.Second, "HTTP写入超时时间")
 
 	flag.DurationVar(&http_api_timeout, "http-api-timeout", 30*time.Second, "HTTP API请求超时时间")
+
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "wss2cgi program by ly65")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "ly65-miao doesn't know how to use it, though...\r")
+		fmt.Fprintf(flag.CommandLine.Output(), "                                               \n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [flags...]", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		flag.PrintDefaults()
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+	}
+
+	flag.Parse()
 }
 
 func config_init() {
