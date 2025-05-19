@@ -71,7 +71,7 @@ func config_parse_flags() {
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "\n")
-		fmt.Fprintf(flag.CommandLine.Output(), "wss2cgi program by ly65")
+		fmt.Fprintf(flag.CommandLine.Output(), "ws2cgi program by ly65")
 		fmt.Fprintf(flag.CommandLine.Output(), "\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "ly65-miao doesn't know how to use it, though...\r")
 		fmt.Fprintf(flag.CommandLine.Output(), "                                               \n")
