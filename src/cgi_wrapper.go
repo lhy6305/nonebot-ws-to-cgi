@@ -113,6 +113,6 @@ func (r *responseRecorder) String() string {
 		fmt.Fprintf(&sb, "%s: %s\n", key, strings.Join(values, ", "))
 	}
 	fmt.Fprintf(&sb, "%q\n", r.body.String())
-	fmt.Fprintf(&sb, "\n----- end of cgi output -----\n\n")
+	fmt.Fprintf(&sb, "\n----- end of cgi output -----\n")
 	return sb.String()
 }
