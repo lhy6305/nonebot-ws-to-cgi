@@ -72,10 +72,10 @@ func call_cgi(data []byte) ([]byte, error) {
 	handler.ServeHTTP(resp, req)
 
 	if resp.statusCode <= 0 {
-		resp.statusCode = http.StatusOK
+		resp.statusCode = 200
 	}
 
-	if resp.statusCode != http.StatusOK {
+	if resp.statusCode < 200 || resp.statusCode >= 300 {
 		return nil, fmt.Errorf("CGI returned status %d", resp.statusCode)
 	}
 
