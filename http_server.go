@@ -48,17 +48,19 @@ func http_handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 
-	authToken := r.Header.Get("Authorization")
-
 	if r.Method != http.MethodPost {
 		http_write_error(w, 405, "request method not allowed")
 		return
 	}
 
-	if authToken != ws_auth_token {
-		http_write_error(w, 403, "invalid auth headers")
-		custom_log("Warn", "Invalid auth token: %s", authToken)
-		return
+	if len(ws_auth_token) > 0 {
+		authToken := r.Header.Get("Authorization")
+
+		if authToken != ws_auth_token {
+			http_write_error(w, 403, "invalid auth headers")
+			custom_log("Warn", "Invalid auth token: %s", authToken)
+			return
+		}
 	}
 
 	action := strings.Trim(r.URL.Path, "/ \t\r\n")
