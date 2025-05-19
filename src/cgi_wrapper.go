@@ -25,9 +25,9 @@ func call_cgi_wrapper(message []byte) {
 	}
 	custom_log("Debug", "CGI processed in %s with status code %d", time.Since(time_start), resp.statusCode)
 	if len(resp.body.Bytes()) > 0 {
-		custom_log("Warn", "CGI response is not empty: %v", resp.String())
+		custom_log("Warn", "CGI output is not empty:\n%v", resp.String())
 	} else {
-		custom_log("Trace", "CGI response: %v", resp.String())
+		custom_log("Trace", "CGI output:\n%v", resp.String())
 	}
 }
 
@@ -107,12 +107,12 @@ func (r *responseRecorder) WriteHeader(statusCode int) {
 
 func (r *responseRecorder) String() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "----- begin of cgi output -----\n")
+	fmt.Fprintf(&sb, "\n----- begin of cgi output -----\n\n")
 	fmt.Fprintf(&sb, "status code: %d\n", r.statusCode)
 	for key, values := range r.header {
 		fmt.Fprintf(&sb, "%s: %s\n", key, strings.Join(values, ", "))
 	}
 	fmt.Fprintf(&sb, "%q\n", r.body.String())
-	fmt.Fprintf(&sb, "----- end of cgi output -----\n")
+	fmt.Fprintf(&sb, "\n----- end of cgi output -----\n\n")
 	return sb.String()
 }
