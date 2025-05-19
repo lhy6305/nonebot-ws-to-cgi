@@ -6,8 +6,6 @@ import (
 
 func main() {
 
-	config_init()
-
 	if instance_pid := process_get_another_instance_pid(); instance_pid > 0 {
 		if !allow_multi_instance {
 			custom_log("Fatal", "A same instance (pid %d) is already running", instance_pid)
@@ -18,6 +16,8 @@ func main() {
 		custom_log("Warn", "A same instance (pid %d) is already running", instance_pid)
 		custom_log("Warn", "")
 	}
+
+	config_init()
 
 	go http_server_loop()
 
