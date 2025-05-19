@@ -36,26 +36,30 @@ func ws_conn_loop() {
 	var err error = nil
 
 	for {
+		ws_conn_mutex.Lock()
 		if ws_conn != nil {
 			ws_conn.Close()
 		}
+		ws_conn_mutex.Unlock()
 
-		custom_log("Info", "Connecting to WebSocket server")
+		custom_log("Info", "connecting to ws server %s", ws_url)
 
 		header := http.Header{}
 		header.Set("Authorization", ws_auth_token)
 
+		ws_conn_mutex.Lock()
 		ws_conn, _, err = dialer.Dial(ws_url, header)
+		ws_conn_mutex.Unlock()
 		if err != nil {
-			custom_log("Error", "WebSocket dial error: %v", err)
+			custom_log("Error", "ws dial error: %v", err)
 			time.Sleep(1 * time.Second)
 			continue
 		}
-		custom_log("Info", "Connected to WebSocket server")
+		custom_log("Debug", "ws server connected")
 
 		handle_ws_conn() // will block here until error
 
-		custom_log("Info", "Connection closed, reconnecting...")
+		custom_log("Warn", "ws connection closed, reconnecting...")
 		time.Sleep(500 * time.Millisecond)
 		continue
 	}
@@ -64,23 +68,25 @@ func ws_conn_loop() {
 // sync call: block until error
 func handle_ws_conn() {
 	for {
+		ws_conn_mutex.Lock()
 		msg_type, msg, err := ws_conn.ReadMessage()
+		ws_conn_mutex.Unlock()
 		if err != nil {
-			custom_log("Error", "WebSocket recv error: %v", err)
+			custom_log("Error", "ws recv error: %v", err)
 			return
 		}
 
-		custom_log("Debug", "WebSocket recv %d bytes, type %v", len(msg), msg_type)
+		custom_log("Debug", "ws recv %d bytes, type %v", len(msg), msg_type)
 		custom_log("Trace", "%v", string(msg))
 
 		if msg_type != websocket.TextMessage && msg_type != websocket.BinaryMessage {
-			custom_log("Warn", "WebSocket recv %d bytes, type %v", len(msg), msg_type)
+			custom_log("Warn", "ws recv %d bytes, type %v", len(msg), msg_type)
 			custom_log("Debug", "%v", string(msg))
 			continue
 		}
 		var data map[string]interface{}
 		if err := json.Unmarshal(msg, &data); err != nil {
-			custom_log("Error", "ws_conn: invalid JSON: %v", err)
+			custom_log("Error", "ws recv message is not a valid JSON: %v", err)
 			continue
 		}
 

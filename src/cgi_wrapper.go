@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/cgi"
+	"strings"
 	"time"
 )
 
@@ -17,19 +18,20 @@ func call_cgi_wrapper(message []byte) {
 	defer func() { <-cgi_worker_sem }()
 
 	time_start := time.Now()
-	resp, err := call_cgi(message)
-	if err != nil {
-		custom_log("Error", "CGI call error: %v", err)
+	resp := call_cgi(message)
+	if resp == nil {
+		custom_log("Error", "error in CGI call. see above for details")
 		return
 	}
-	custom_log("Debug", "CGI processed in %s", time.Since(time_start))
-
-	if len(resp) > 0 {
-		custom_log("Warn", "CGI response is not empty: %d bytes: %v", len(resp), string(resp))
+	custom_log("Debug", "CGI processed in %s with status code %d", time.Since(time_start), resp.statusCode)
+	if len(resp.body.Bytes()) > 0 {
+		custom_log("Warn", "CGI response is not empty: %v", resp.String())
+	} else {
+		custom_log("Trace", "CGI response: %v", resp.String())
 	}
 }
 
-func call_cgi(data []byte) ([]byte, error) {
+func call_cgi(data []byte) *responseRecorder {
 	// Set up CGI environment variables
 	env := []string{
 		//"AUTH_TYPE=",
@@ -61,7 +63,8 @@ func call_cgi(data []byte) ([]byte, error) {
 
 	req, err := http.NewRequest("POST", "cgi://", bytes.NewReader(data))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		custom_log("Error", "failed to create request: %v", err)
+		return nil
 	}
 	//req.Header.Set("Content-Type", "application/json")
 	req.ContentLength = int64(len(data))
@@ -81,11 +84,7 @@ func call_cgi(data []byte) ([]byte, error) {
 		resp.statusCode = 200
 	}
 
-	if resp.statusCode < 200 || resp.statusCode >= 300 {
-		return nil, fmt.Errorf("CGI returned status %d", resp.statusCode)
-	}
-
-	return resp.body.Bytes(), nil
+	return resp
 }
 
 type responseRecorder struct {
@@ -104,4 +103,14 @@ func (r *responseRecorder) Write(data []byte) (int, error) {
 
 func (r *responseRecorder) WriteHeader(statusCode int) {
 	r.statusCode = statusCode
+}
+
+func (r *responseRecorder) String() string {
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "HTTP %d\n", r.statusCode)
+	for key, values := range r.header {
+		fmt.Fprintf(&sb, "%s: %s\n", key, strings.Join(values, ", "))
+	}
+	fmt.Fprintf(&sb, "%q\n", r.body.String())
+	return sb.String()
 }

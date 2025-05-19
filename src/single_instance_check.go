@@ -15,7 +15,7 @@ func process_get_another_instance_pid() int32 {
 
 	self_proc, err := process.NewProcess(self_pid)
 	if err != nil {
-		custom_log("Warn", "Failed to get self process: %v", err)
+		custom_log("Error", "Failed to get self process: %v", err)
 		return 0
 	}
 

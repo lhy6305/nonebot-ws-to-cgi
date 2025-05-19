@@ -5,6 +5,8 @@ import (
 )
 
 func main() {
+	custom_log("Info", "Program started")
+	defer custom_log("Info", "Program exited")
 
 	if instance_pid := process_get_another_instance_pid(); instance_pid > 0 {
 		if !allow_multi_instance {

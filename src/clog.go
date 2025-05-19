@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"path"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 var (

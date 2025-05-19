@@ -24,14 +24,18 @@ func http_server_loop() {
 	}
 
 	for {
-		custom_log("Info", "Starting HTTP server on %s", http_listen_addr)
+		custom_log("Info", "starting http server on %s", http_listen_addr)
 		err := server.ListenAndServe()
-		custom_log("Error", "HTTP server failed: %v", err)
+		custom_log("Error", "http server failed: %v", err)
 		time.Sleep(500 * time.Millisecond)
 	}
 }
 
 func http_handler(w http.ResponseWriter, r *http.Request) {
+	defer func(start time.Time) {
+		custom_log("Debug", "http %s request from %s to path %s took %dms", r.Method, r.RemoteAddr, r.URL.Path, time.Since(start).Milliseconds())
+	}(time.Now())
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
@@ -54,11 +58,11 @@ func http_handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(ws_auth_token) > 0 {
-		authToken := r.Header.Get("Authorization")
+		client_auth_token := r.Header.Get("Authorization")
 
-		if authToken != ws_auth_token {
-			http_write_error(w, 403, "invalid auth headers")
-			custom_log("Warn", "Invalid auth token: %s", authToken)
+		if client_auth_token != ws_auth_token {
+			http_write_error(w, 403, "invalid auth token")
+			custom_log("Warn", "invalid auth token provided: %s", client_auth_token)
 			return
 		}
 	}
