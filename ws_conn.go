@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -19,12 +20,15 @@ var (
 // async call
 func ws_conn_loop() {
 	dialer := websocket.DefaultDialer
-	dialer.TLSClientConfig = &tls.Config{
-		MinVersion: tls.VersionTLS12,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		},
+
+	if strings.HasPrefix(ws_url, "wss") {
+		dialer.TLSClientConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			},
+		}
 	}
 
 	var err error = nil
@@ -39,7 +43,7 @@ func ws_conn_loop() {
 		header := http.Header{}
 		header.Set("Authorization", ws_auth_token)
 
-		ws_conn, _, err = dialer.Dial(wss_url, header)
+		ws_conn, _, err = dialer.Dial(ws_url, header)
 		if err != nil {
 			custom_log("Error", "WebSocket dial error: %v", err)
 			time.Sleep(1 * time.Second)

@@ -16,7 +16,7 @@ var (
 	clog_logfile_path           string
 	clog_enable_colored_output  bool
 
-	wss_url       string
+	ws_url        string
 	ws_auth_token string
 
 	ws_max_api_resp_queue_size int
@@ -51,7 +51,7 @@ func config_parse_flags() {
 	flag.StringVar(&clog_logfile_path, "clog-logfile-path", "wss2cgi_log.txt", "")
 	flag.BoolVar(&clog_enable_colored_output, "clog-enable-colored-output", true, "")
 
-	flag.StringVar(&wss_url, "wss-url", "wss://example/path", "WebSocket服务器地址（仅支持wss）")
+	flag.StringVar(&ws_url, "ws-url", "ws://example/path", "WebSocket服务器地址（支持wss）")
 	flag.StringVar(&ws_auth_token, "ws-auth-token", "Bearer your_auth_token", "WebSocket认证令牌")
 
 	flag.IntVar(&ws_max_api_resp_queue_size, "ws-max-api-resp-queue-size", 16, "")
