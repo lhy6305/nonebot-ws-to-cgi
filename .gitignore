@@ -1,0 +1,7 @@
+/config.go
+/*.bat
+/*.sh
+/ssh-*
+
+*.elf
+*.exe

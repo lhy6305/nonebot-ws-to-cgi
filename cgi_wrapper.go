@@ -1,0 +1,101 @@
+package main
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/cgi"
+	"time"
+)
+
+func call_cgi_wrapper(message []byte) {
+	cgi_worker_sem <- struct{}{}
+	defer func() { <-cgi_worker_sem }()
+
+	time_start := time.Now()
+	resp, err := call_cgi(message)
+	if err != nil {
+		custom_log("Error", "CGI call error: %v", err)
+		return
+	}
+	custom_log("Debug", "CGI processed in %s", time.Since(time_start))
+	custom_log("Trace", "response: %d bytes: %v", len(resp), string(resp))
+}
+
+func call_cgi(data []byte) ([]byte, error) {
+	// Set up CGI environment variables
+	env := []string{
+		//"AUTH_TYPE=",
+		//"CONTENT_LENGTH=" + strconv.Itoa(len(data)),
+		//"CONTENT_TYPE=application/json",
+		//"GATEWAY_INTERFACE=CGI/1.1",
+		//"PATH_INFO=",
+		//"PATH_TRANSLATED=",
+		//"QUERY_STRING=",
+		//"REMOTE_ADDR=127.0.0.1",
+		//"REMOTE_HOST=",
+		//"REMOTE_IDENT=",
+		//"REMOTE_USER=",
+		//"REQUEST_METHOD=POST",
+		"SCRIPT_FILENAME=" + cgi_script_entry,
+		//"SERVER_NAME=localhost",
+		//"SERVER_PORT=80",
+		//"SERVER_PROTOCOL=HTTP/1.1",
+		//"SERVER_SOFTWARE=",
+		"REDIRECT_STATUS=200", // Required for php-cgi program
+	}
+
+	handler := &cgi.Handler{
+		Path: cgi_program_path,
+		//Args: []string{filepath.Join(self_path, cgi_script_entry)},
+		Dir: self_path,
+		Env: env,
+	}
+
+	req, err := http.NewRequest("POST", "cgi://", bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	//req.Header.Set("Content-Type", "application/json")
+	req.ContentLength = int64(len(data))
+
+	if cgi_max_exec_time > 0 {
+		ctx, _ := context.WithTimeout(context.Background(), cgi_max_exec_time)
+		req = req.WithContext(ctx)
+	}
+
+	resp := &responseRecorder{
+		header: make(http.Header),
+	}
+
+	handler.ServeHTTP(resp, req)
+
+	if resp.statusCode <= 0 {
+		resp.statusCode = http.StatusOK
+	}
+
+	if resp.statusCode != http.StatusOK {
+		return nil, fmt.Errorf("CGI returned status %d", resp.statusCode)
+	}
+
+	return resp.body.Bytes(), nil
+}
+
+type responseRecorder struct {
+	header     http.Header
+	body       bytes.Buffer
+	statusCode int
+}
+
+func (r *responseRecorder) Header() http.Header {
+	return r.header
+}
+
+func (r *responseRecorder) Write(data []byte) (int, error) {
+	return r.body.Write(data)
+}
+
+func (r *responseRecorder) WriteHeader(statusCode int) {
+	r.statusCode = statusCode
+}
