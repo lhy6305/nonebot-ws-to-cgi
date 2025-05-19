@@ -114,4 +114,7 @@ func config_init() {
 	}
 
 	cgi_script_entry = filepath.Join(self_path, cgi_script_entry)
+
+	custom_log("Info", "the cgi program path is %s", cgi_program_path)
+	custom_log("Info", "the cgi program entry is %s", cgi_script_entry)
 }
