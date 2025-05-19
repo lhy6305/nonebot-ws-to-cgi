@@ -71,6 +71,7 @@ func custom_log(level string, format string, args ...interface{}) {
 		clog_logfile_handle.WriteString(fmt.Sprintf("%s %s%d%s [%s] ", time.Now().Format("15:04:05"), file, line, func_name, level))
 		clog_logfile_handle.WriteString(fmt.Sprintf(format, args...))
 		clog_logfile_handle.WriteString("\n")
+		clog_logfile_handle.Sync()
 	}
 
 	if clog_log_trace_to_file_only && strings.EqualFold(level, "Trace") {
