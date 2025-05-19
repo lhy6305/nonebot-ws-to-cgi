@@ -10,6 +10,8 @@ import (
 )
 
 var (
+	allow_multi_instance bool
+
 	clog_enable_debug           bool
 	clog_enable_trace           bool
 	clog_log_trace_to_file_only bool
@@ -45,6 +47,8 @@ var (
 )
 
 func config_parse_flags() {
+	flag.BoolVar(&allow_multi_instance, "allow-multi-instance", false, "允许具有相同命令行的多实例运行（不建议）")
+
 	flag.BoolVar(&clog_enable_debug, "clog-enable-debug", true, "")
 	flag.BoolVar(&clog_enable_trace, "clog-enable-trace", true, "")
 	flag.BoolVar(&clog_log_trace_to_file_only, "clog-log-trace-to-file-only", false, "")
@@ -112,16 +116,19 @@ func config_init() {
 		custom_log("Fatal", "Failed to lookup cgi executable: %v", err)
 		os.Exit(1)
 	}
+	custom_log("Info", "the cgi program path is %s", cgi_program_path)
 
 	cgi_script_entry = filepath.Join(self_path, cgi_script_entry)
-
 	if cgi_max_worker_count <= 0 {
 		custom_log("Fatal", "cgi_max_worker_count %d must be bigger than 0", cgi_max_worker_count)
 		os.Exit(1)
 	}
+	custom_log("Info", "the cgi program entry is %s", cgi_script_entry)
 
 	cgi_worker_sem = make(chan struct{}, cgi_max_worker_count)
 
-	custom_log("Info", "the cgi program path is %s", cgi_program_path)
-	custom_log("Info", "the cgi program entry is %s", cgi_script_entry)
+	if allow_multi_instance {
+		custom_log("Warn", "allow_multi_instance flag is set to TRUE")
+		custom_log("Warn", "THIS IS NOT RECOMMENDED")
+	}
 }
