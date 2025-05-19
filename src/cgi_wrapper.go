@@ -107,10 +107,12 @@ func (r *responseRecorder) WriteHeader(statusCode int) {
 
 func (r *responseRecorder) String() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "HTTP %d\n", r.statusCode)
+	fmt.Fprintf(&sb, "----- begin of cgi output -----\n")
+	fmt.Fprintf(&sb, "status code: %d\n", r.statusCode)
 	for key, values := range r.header {
 		fmt.Fprintf(&sb, "%s: %s\n", key, strings.Join(values, ", "))
 	}
 	fmt.Fprintf(&sb, "%q\n", r.body.String())
+	fmt.Fprintf(&sb, "----- end of cgi output -----\n")
 	return sb.String()
 }
