@@ -11,7 +11,7 @@ import (
 
 func call_cgi_wrapper(message []byte) {
 	custom_log("Debug", "calling CGI with %d bytes", len(message))
-	custom_log("Trace", "%v", len(message), string(message))
+	custom_log("Trace", "%v", string(message))
 
 	cgi_worker_sem <- struct{}{}
 	defer func() { <-cgi_worker_sem }()
