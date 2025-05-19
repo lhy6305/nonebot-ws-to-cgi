@@ -49,8 +49,8 @@ var (
 func config_parse_flags() {
 	flag.BoolVar(&allow_multi_instance, "allow-multi-instance", false, "允许具有相同命令行的多实例运行（不建议）")
 
-	flag.BoolVar(&clog_enable_debug, "clog-enable-debug", true, "")
-	flag.BoolVar(&clog_enable_trace, "clog-enable-trace", true, "")
+	flag.BoolVar(&clog_enable_debug, "clog-enable-debug", false, "")
+	flag.BoolVar(&clog_enable_trace, "clog-enable-trace", false, "")
 	flag.BoolVar(&clog_log_trace_to_file_only, "clog-log-trace-to-file-only", false, "")
 	flag.StringVar(&clog_logfile_path, "clog-logfile-path", "wss2cgi_log.txt", "")
 	flag.BoolVar(&clog_enable_colored_output, "clog-enable-colored-output", true, "")
