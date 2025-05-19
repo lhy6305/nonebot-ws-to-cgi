@@ -23,7 +23,10 @@ func call_cgi_wrapper(message []byte) {
 		return
 	}
 	custom_log("Debug", "CGI processed in %s", time.Since(time_start))
-	custom_log("Trace", "response: %d bytes: %v", len(resp), string(resp))
+
+	if len(resp) > 0 {
+		custom_log("Warn", "CGI response is not empty: %d bytes: %v", len(resp), string(resp))
+	}
 }
 
 func call_cgi(data []byte) ([]byte, error) {
