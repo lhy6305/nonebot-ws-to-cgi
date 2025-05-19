@@ -41,7 +41,7 @@ var (
 	self_path = ""
 
 	cgi_program_path = ""
-	cgi_worker_sem   = make(chan struct{}, cgi_max_worker_count)
+	cgi_worker_sem   (chan struct{})
 )
 
 func config_parse_flags() {
@@ -114,6 +114,13 @@ func config_init() {
 	}
 
 	cgi_script_entry = filepath.Join(self_path, cgi_script_entry)
+
+	if cgi_max_worker_count <= 0 {
+		custom_log("Fatal", "cgi_max_worker_count %d must be bigger than 0", cgi_max_worker_count)
+		os.Exit(1)
+	}
+
+	cgi_worker_sem = make(chan struct{}, cgi_max_worker_count)
 
 	custom_log("Info", "the cgi program path is %s", cgi_program_path)
 	custom_log("Info", "the cgi program entry is %s", cgi_script_entry)
