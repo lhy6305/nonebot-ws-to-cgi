@@ -34,6 +34,6 @@ func gen_unique_id() string {
 func test_random_function() {
 	randBytes := make([]byte, 16)
 	if _, err := rand.Read(randBytes); err != nil {
-		custom_log("Warn", "rand.Read() failed in testing: %v")
+		custom_log("Warn", "rand.Read() failed in testing: %v", err)
 	}
 }

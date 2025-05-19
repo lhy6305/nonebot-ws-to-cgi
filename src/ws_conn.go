@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -13,6 +14,7 @@ import (
 
 var (
 	ws_conn             *websocket.Conn = nil
+	ws_conn_mutex                       = &sync.Mutex{}
 	ws_pull_buffer_chan                 = make(chan []byte, ws_max_pull_queue_size)
 	ws_push_buffer_chan                 = make(chan []byte, ws_max_push_queue_size)
 )
