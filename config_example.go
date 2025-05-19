@@ -1,3 +1,6 @@
+//go:build none
+// +build none
+
 package main
 
 import (
@@ -26,7 +29,7 @@ var (
 	cgi_max_exec_time    = 0 * time.Second
 	cgi_max_worker_count = 16
 
-	http_listen_addr   = "127.0.0.1:8000"
+	http_listen_addr   = "127.0.0.1:5700"
 	http_read_timeout  = 0 * time.Second
 	http_write_timeout = 0 * time.Second
 
